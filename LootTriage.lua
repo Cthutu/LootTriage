@@ -374,6 +374,7 @@ local function OnAddonLoaded()
     end
 
     ns.CollectContainerFrames()
+    if ns.InitBetterBags then ns.InitBetterBags() end
     ns.HookContainerFrames()
     ns.HookLootRows()
     if Settings and Settings.RegisterVerticalLayoutCategory then

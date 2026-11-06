@@ -2,9 +2,9 @@
 ## Title: LootTriage
 ## Notes: Looting with full bags? Shows which loot is worth taking and which items to delete.
 ## Author: Krelock
-## Version: 1.1.5
+## Version: 1.1.5-betterbags.1
 ## SavedVariables: LootTriageDB
-## OptionalDeps: Auctionator
+## OptionalDeps: Auctionator, BetterBags
 ## IconTexture: Interface\Icons\INV_Misc_Bag_08
 ## Category: Inventory
 
@@ -12,6 +12,7 @@ QuestItems.lua
 LootTriage.lua
 Quests.lua
 Bags.lua
+BetterBags.lua
 Sorting.lua
 Loot.lua
 Tooltip.lua

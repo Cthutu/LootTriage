@@ -26,6 +26,9 @@ local entryBySlot = {} -- [slotKey] = its candidate or loot pair, for the toolti
 local shinyBySlot = {} -- [slotKey] = true: its loot is worth more, so it sparkles
 local overlays = {}    -- [bag button] = its highlight
 local containerFrames = {}
+local betterBagsButtons = {}
+local tooltipButtons = {}
+ns.betterBagsButtons, ns.tooltipButtons = betterBagsButtons, tooltipButtons
 
 ---------------------------------------------------------------------------
 -- Glow
@@ -172,7 +175,7 @@ end
 -- fn(button, bag, slot) for each bag addon button on screen with one of your slots.
 local function ForEachAddonButton(fn)
     for button in pairs(addonButtons) do
-        if button:IsVisible() then
+        if not betterBagsButtons[button] and button:IsVisible() then
             local bag, slot = AddonButtonSlot(button)
             if bag then fn(button, bag, slot) end
         end
@@ -187,6 +190,7 @@ local function AddonBagsOpen()
 end
 
 local function BagsOpen()
+    if ns.BetterBagsOpen and ns.BetterBagsOpen() then return true end
     for _, frame in ipairs(containerFrames) do
         if frame:IsShown() then return true end
     end
@@ -258,7 +262,10 @@ end
 local function OnBagItemClick(button, mouseButton)
     if not ns.db or not IsKeepClick(mouseButton) then return end
     local bag, slot
-    if addonButtons[button] then
+    if betterBagsButtons[button] then
+        bag, slot = ns.GetBetterBagsSlot(betterBagsButtons[button])
+        if not bag then return end
+    elseif addonButtons[button] then
         bag, slot = AddonButtonSlot(button)
         if not bag then return end
     else
@@ -311,11 +318,11 @@ local function UpdateQuestMark(button, bag, slot, itemID)
 end
 
 -- One bag button: its highlight, star and quest mark.
-local function UpdateBagButton(button, bag, slot)
+local function UpdateBagButton(button, bag, slot, integration)
     -- The bags make buttons as they need them, so each is hooked when it's seen.
-    HookBagButton(button)
+    HookBagButton(integration and integration.click or button)
     if not bag or not slot then return end
-    local key = SlotKey(bag, slot)
+    local key = integration and integration.highlightKey or SlotKey(bag, slot)
     local rank = rankBySlot[key]
     if rank then
         local o = GetOverlay(button)
@@ -323,6 +330,8 @@ local function UpdateBagButton(button, bag, slot)
         o.text:SetText(rank)
         o.rank = rank
         o.entry = entryBySlot[key]
+        o.combined = integration and integration.combined or false
+        o:SetFrameLevel(math.max(button:GetFrameLevel(), integration and integration.click:GetFrameLevel() or 0) + 5)
         o:Show()
     end
     if anyKept or ns.db.questMark then
@@ -343,6 +352,7 @@ local function RefreshOverlays()
     anyKept = next(ns.db.keep) ~= nil
     ForEachBagButton(UpdateBagButton)
     if otherBags then ForEachAddonButton(UpdateBagButton) end
+    if ns.ForEachBetterBagsButton then ns.ForEachBetterBagsButton(UpdateBagButton) end
 end
 
 ---------------------------------------------------------------------------

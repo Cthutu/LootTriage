@@ -42,7 +42,10 @@ end
 local function AddTooltipLine(tooltip, data)
     if tooltip ~= GameTooltip or not ns.db then return end
     local owner = tooltip:GetOwner()
-    local inBags = owner ~= nil and hookedBagButtons[owner] ~= nil
+    local visual = ns.tooltipButtons[owner] or owner
+    local inBags = owner ~= nil and (hookedBagButtons[owner] ~= nil or visual ~= owner)
+    local integrated = ns.betterBagsButtons[visual]
+    if integrated and not ns.GetBetterBagsSlot(integrated) then inBags = false end
 
     local itemID = data and data.id
     if itemID and ns.db.keep[itemID] then
@@ -71,10 +74,14 @@ local function AddTooltipLine(tooltip, data)
     end
     if not owner then return end
 
-    local o = overlays[owner]
+    local o = overlays[visual]
     if o and o.entry and o:IsShown() then
         tooltip:AddLine(("LootTriage: delete candidate #%d (%s)"):format(o.rank, ValueText(o.entry)),
             GOLD_R, GOLD_G, GOLD_B)
+        if o.combined then
+            tooltip:AddLine(("One physical stack: %d items in bag %d, slot %d. Use BetterBags' Show Bags to find this stack before deleting."):format(
+                o.entry.count, o.entry.bag, o.entry.slot), GOLD_R, GOLD_G, GOLD_B, true)
+        end
         local hint = KeepHint(inBags)
         if hint then
             tooltip:AddLine(hint .. " to never suggest this item for deletion", 0.6, 0.6, 0.6)
