@@ -13,7 +13,7 @@ LootTriage's corner sorting still applies only to Blizzard's bags. BetterBags co
 Copy the `.lua` files and `LootTriage.toc` from this checkout into the installed `Interface/AddOns/LootTriage` folder. Back up the installed files first. Restart WoW after the first installation because the TOC now loads `BetterBags.lua`; subsequent Lua edits can be tested with `/reload`.
 
 1. Open BetterBags and use `/lt` to select **Always** highlighting or run the highlight preview.
-2. Confirm each candidate has one glow/rank. Alt-left-click an item to toggle its keep star, then check its tooltip.
+2. Confirm each candidate has one glow/rank. Alt-left-click an item to toggle its keep gold border, then check its tooltip.
 3. Switch categories, views and themes; close/reopen bags and move an item. Confirm markers follow their items and disappear from empty slots.
 4. Enable merged stacks with differently sized stacks of the same item. Check the rank and physical quantity in the tooltip, then use Show Bags to locate the candidate.
 5. Check list rows, bank items and the item browser. Bank and preview items must not get deletion markers or keep-click handling.

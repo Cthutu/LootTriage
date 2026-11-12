@@ -106,7 +106,7 @@ local function RegisterSettings()
         return container:GetData()
     end
     CreateDropdown(category, Setting("keepClick", "Click in bags"), KeepClickOptions,
-        "Click an item in your bags this way to give it a star: it will never be suggested for deletion. Click again to undo. Note: in the default game, Ctrl+click also previews gear in the dressing room.")
+        "Click an item in your bags this way to give it a gold border: it will never be suggested for deletion. Click again to undo. Note: in the default game, Ctrl+click also previews gear in the dressing room.")
 
     Page("Never highlight")
     Checkbox("keepConsumables", "Consumables",
@@ -148,12 +148,21 @@ local function RegisterSettings()
     -- Without a price addon the rows are grayed out and their tooltips say why. Only
     -- the row reads its modify predicates (not the search), so they can't taint it.
     Page("Auction prices")
-    local needs = not ns.priceAddon and "\n\n" .. RED_FONT_COLOR:WrapTextInColorCode("Needs Auctionator or Blackthornes Tradeskills. Install one to use this.") or ""
+    local needs = not ns.priceAddon and "\n\n" .. RED_FONT_COLOR:WrapTextInColorCode("Needs Auctionator, TradeSkillMaster, AuctionMaster or Blackthornes Tradeskills. Install one to use this.") or ""
     local function NeedsPriceAddon(initializer)
         if not ns.priceAddon then initializer:AddModifyPredicate(function() return false end) end
     end
     NeedsPriceAddon(Checkbox("auctionPrices", "Auction prices",
         "Count an item as worth its auction price when that's more than a vendor pays. Gray items, soulbound items and prices older than Price age use the vendor price." .. needs))
+    -- Only the price addons installed; "None" without one.
+    local function PriceSourceOptions()
+        local container = Settings.CreateControlTextContainer()
+        for _, source in ipairs(ns.priceSources) do container:Add(source.key, source.name) end
+        if not ns.priceAddon then container:Add("", "None") end
+        return container:GetData()
+    end
+    NeedsPriceAddon(CreateDropdown(category, Setting("priceSource", "Price source"), PriceSourceOptions,
+        "Which addon's auction prices to use. TradeSkillMaster's are its market value from the TSM desktop app and have no age, so Price age doesn't apply to them." .. needs))
     NeedsPriceAddon(Slider("auctionMaxAge", "Price age", 1, 30,
         "Auction prices older than this many days use the vendor price instead." .. needs))
     NeedsPriceAddon(Slider("auctionCutPercent", "Auction house cut", 0, 15,
@@ -202,7 +211,7 @@ local function ShowHelp()
     print(("  /lt test - show the highlights for %d seconds (open your bags to see them)"):format(PREVIEW_SECONDS))
     print("  /lt keep [item] - never suggest an item for deletion (shift-click it into chat)")
     print("  /lt unkeep [item] - allow an item to be suggested again")
-    print("  /lt keeplist - list starred items")
+    print("  /lt keeplist - list kept items")
 end
 
 -- /lt and its commands (ShowHelp lists them).
@@ -237,10 +246,10 @@ local function HandleSlash(msg)
         Print(link .. (cmd == "keep" and " will never be suggested for deletion." or " can be suggested for deletion again."))
     elseif cmd == "keeplist" then
         if next(ns.db.keep) == nil then
-            Print("no starred items.")
+            Print("no kept items.")
             return
         end
-        Print("starred items (never suggested for deletion):")
+        Print("kept items (never suggested for deletion):")
         for id in pairs(ns.db.keep) do
             print("  " .. (select(2, GetItemInfo(id)) or ("item " .. id)))
         end
