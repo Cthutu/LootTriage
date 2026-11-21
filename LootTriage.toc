@@ -2,9 +2,9 @@
 ## Title: LootTriage
 ## Notes: Looting with full bags? Shows which loot is worth taking and which items to delete.
 ## Author: Krelock
-## Version: 1.2.0.1-betterbags.1
+## Version: 1.2.1-betterbags.1
 ## SavedVariables: LootTriageDB
-## OptionalDeps: Auctionator, TradeSkillMaster, AuctionMaster, Blackthornes_TS, BetterBags
+## OptionalDeps: Auctionator, TradeSkillMaster, AuctionMaster, Blackthornes_TS, Baganator, BetterBags
 ## IconTexture: Interface\Icons\INV_Misc_Bag_08
 ## Category: Inventory
 
